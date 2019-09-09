@@ -26,7 +26,7 @@ def getFileList( p ):
 
 
 if __name__ == "__main__":
-	arg_parser = ArgumentParser()
+	arg_parser = ArgumentParser(prog="python retrieve.py", description="ford log retrieve.")
 	arg_parser.add_argument('log_files', nargs = '*', help = "ford log files")
 	arg_parser.add_argument('--dir', help="output directory")
 	args = arg_parser.parse_args()
@@ -43,6 +43,8 @@ if __name__ == "__main__":
 
 	if args.dir:
 		outputDir = args.dir
+	else:
+		outputDir = os.curdir
 
 	main(outputDir, fordLogFiles)
 	pass
