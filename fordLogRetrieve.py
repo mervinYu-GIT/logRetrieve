@@ -2,6 +2,7 @@
 #-*- coding: utf-8 -*-
 import os
 import sys
+import re
 
 class FordLogRetrieve:
 	def __init__(self):
@@ -41,7 +42,6 @@ class FordLogRetrieve:
 						fordLogLines.append(tempLine)
 						tempLine = ""
 						tempLine += line
-						isNewLine = False
 					else:
 						tempLine = ""
 						tempLine += line
@@ -77,6 +77,8 @@ class FordLogRetrieve:
 
 
 	def __output(self):
+		pattern = r"(Inf|Dbg|Wrn|Crt|Ftl)\|"
+		prog = re.compile(pattern)
 		oldDir = os.getcwd()
 		newDir = os.path.normpath(self.dirName)
 		os.chdir(newDir)
@@ -88,8 +90,28 @@ class FordLogRetrieve:
 			filePath = "navigation-" + key + ".log"
 			lines = []
 			with open(filePath, "w") as navLogFile:
+				tempLine = ""
+				newLine = False
 				for line in value:
-					lines.append(line[line.index(" ", line.index("tid")) + 1 : ])
+					line = line[line.index(" ", line.index("tid")) + 1 :]
+					if prog.match(line):
+						if newLine:
+							lines.append(tempLine)
+							tempLine = ""
+							tempLine += line
+						else:
+							tempLine = ""
+							tempLine += line
+							newLine = True
+					else:
+						if newLine:
+							tempLine = tempLine.rstrip() + line
+						else:
+							pass
+				
+				if prog.match(tempLine):
+					lines.append(tempLine)
+					
 				navLogFile.writelines(lines)
 
 		os.chdir(oldDir)
